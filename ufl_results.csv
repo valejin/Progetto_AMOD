@@ -1,0 +1,5 @@
+instance,algorithm,objective,time_sec,num_facilities,num_customers,opened_facilities_count
+cap132.txt,strong,851495.3250000001,0.9199132929998086,50,50,11
+cap132.txt,weak,851495.3250000001,0.21323401600011493,50,50,11
+cap132.txt,greedy,862753.375,0.00231349500018041,50,50,12
+cap132.txt,erlenkotter,852762.875,0.006062980000024254,50,50,11
