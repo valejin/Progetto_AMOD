@@ -1,0 +1,3 @@
+amplpy
+pandas  # Utile per l'analisi dei risultati
+numpy
