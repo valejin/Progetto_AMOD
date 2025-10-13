@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 
-def solve_strong_formulation(fixed_costs, transport_costs, solver='gurobi'):
+def solve_strong_formulation(fixed_costs, transport_costs, solver='gurobi', deterministic=False):
     """
     Solves the UFL problem using the strong ILP formulation.
 
@@ -24,13 +24,17 @@ def solve_strong_formulation(fixed_costs, transport_costs, solver='gurobi'):
     # Per Gurobi: threads=1, seed=0
     # Per CPLEX: threads=1, randomseed=1234
     # Usiamo una sintassi generica che molti solver capiscono
-    options_string = 'threads=1'
-    if solver == 'gurobi':
-        options_string += ' seed=123'
-    elif solver == 'cplex':
-        options_string += ' randomseed=1234'
+    # Opzioni per il determinismo + disabilitazione del presolve
+    options = []
+    if deterministic:
+        options.append('threads=1')
+        if solver == 'gurobi':
+            options.append('seed=0')
+        elif solver == 'cplex':
+            options.append('randomseed=1234')
 
-    ampl.setOption(f'{solver}_options', options_string)
+    if options:
+        ampl.setOption(f'{solver}_options', ' '.join(options))
 
     # Define the AMPL model
     ampl.eval(f"""
@@ -90,7 +94,7 @@ def solve_strong_formulation(fixed_costs, transport_costs, solver='gurobi'):
     }
 
 
-def solve_strong_relaxation(fixed_costs, transport_costs, solver='gurobi'):
+def solve_strong_relaxation(fixed_costs, transport_costs, solver='gurobi', deterministic=False):
     """
     Solves the Linear Relaxation of the UFL problem using the strong formulation.
 
@@ -108,17 +112,21 @@ def solve_strong_relaxation(fixed_costs, transport_costs, solver='gurobi'):
     ampl.setOption('solver', solver)
 
     # Opzioni per il determinismo + disabilitazione del presolve
-    options_string = 'threads=1'
-    if solver == 'gurobi':
-        options_string += ' seed=123'
-    elif solver == 'cplex':
-        options_string += ' randomseed=1234'
+    options = []
+    if deterministic:
+        options.append('threads=1')
+        if solver == 'gurobi':
+            options.append('seed=0')
+        elif solver == 'cplex':
+            options.append('randomseed=1234')
 
     # Aggiungiamo l'opzione presolve=0
     # La sintassi per opzioni multiple è separarle con uno spazio
-    options_string += ' presolve=0'
+    if 'relaxation' in 'nome_funzione':
+        options.append('presolve=0')
 
-    ampl.setOption(f'{solver}_options', options_string)
+    if options:
+        ampl.setOption(f'{solver}_options', ' '.join(options))
 
 
     # Definiamo il modello con variabili continue invece che binarie

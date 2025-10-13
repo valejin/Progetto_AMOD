@@ -31,7 +31,7 @@ def parse_or_library_instance(file_path):
     for i in range(num_facilities):
         parts = lines[current_line_idx].strip().split()
         # The format can be just fixed cost or capacity + fixed cost
-        fixed_costs[i] = float(parts[-1])
+        fixed_costs[i] = float(parts[0])
         current_line_idx += 1
 
     # Read customer data (demand and transportation costs)

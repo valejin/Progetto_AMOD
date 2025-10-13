@@ -38,6 +38,11 @@ def main():
         default='gurobi',
         help='The AMPL solver to use for ILP models (e.g., cplex, gurobi).'
     )
+    parser.add_argument(
+        '--deterministic',
+        action='store_true',
+        help='Run MIP solvers in deterministic mode (1 thread).'
+    )
 
     args = parser.parse_args()
 
@@ -51,7 +56,12 @@ def main():
     else:
         algos_to_run = [args.algorithm]
 
-    results = []
+    ordered_algos = [
+        'weak', 'strong', 'weak_rl', 'strong_rl', 'erlenkotter', 'greedy'
+    ]
+    algos_to_run = [algo for algo in ordered_algos if algo in algos_to_run]
+
+    all_results = []
 
     for instance_path in sorted(instance_files):
         print(f"\n--- Processing Instance: {os.path.basename(instance_path)} ---")
@@ -63,19 +73,22 @@ def main():
             print(f"Error parsing {instance_path}: {e}")
             continue
 
+        instance_results = []
+        optimal_value = None
+
         for algo_name in algos_to_run:
-            print(f"\n  -> Running algorithm: {algo_name}...")
+            print(f"  -> Running algorithm: {algo_name}...")
 
             solver_func = ALGORITHMS[algo_name]
             result_obj = None
-            elapsed_time = -1
 
             try:
                 start_time = time.perf_counter()
 
-                # Logica di chiamata corretta
+                # Le funzioni per PLI e RL devono essere modificate per accettare `deterministic`
                 if algo_name in ['strong', 'weak', 'strong_rl', 'weak_rl']:
-                    result_obj = solver_func(fixed_costs, transport_costs, solver=args.solver)
+                    result_obj = solver_func(fixed_costs, transport_costs, solver=args.solver,
+                                             deterministic=args.deterministic)
                 else:
                     result_obj = solver_func(fixed_costs, transport_costs)
 
@@ -85,25 +98,24 @@ def main():
                 print(f"     Objective: {result_obj['objective']:.2f}")
                 print(f"     Time: {elapsed_time:.4f} seconds")
 
-                # Elaborazione robusta dei risultati
                 objective = result_obj['objective']
                 opened_count = len(result_obj['opened_facilities']) if 'opened_facilities' in result_obj else -1
 
-                results.append({
-                    'instance': os.path.basename(instance_path),
+                if algo_name in ['strong', 'weak'] and optimal_value is None:
+                    optimal_value = objective
+
+                instance_results.append({
                     'algorithm': algo_name,
                     'objective': objective,
                     'time_sec': elapsed_time,
                     'num_facilities': num_fac,
                     'num_customers': num_cust,
-                    'opened_facilities_count': opened_count
+                    'opened_facilities_count': opened_count  # Salviamo subito il conteggio
                 })
 
             except Exception as e:
-                # Se c'è un errore, lo stampiamo e registriamo il fallimento
                 print(f"     ERROR running {algo_name}: {e}")
-                results.append({
-                    'instance': os.path.basename(instance_path),
+                instance_results.append({
                     'algorithm': algo_name,
                     'objective': 'Error',
                     'time_sec': -1,
@@ -112,38 +124,57 @@ def main():
                     'opened_facilities_count': -1
                 })
 
-    if results:
-        df_results = pd.DataFrame(results)
-        if results:
-            df_results = pd.DataFrame(results)
+        if optimal_value is not None:
+            for res in instance_results:
+                if res['algorithm'] in ['greedy', 'erlenkotter'] and isinstance(res['objective'], (int, float)):
+                    z_heur = res['objective']
+                    gap = ((z_heur - optimal_value) / optimal_value) * 100 if optimal_value > 0 else 0
+                    res['optimality_gap_%'] = round(gap, 2)
+                else:
+                    res['optimality_gap_%'] = '-'
 
-            # --- STAMPA MIGLIORATA E RAGGRUPPATA ---
-            print("\n\n--- Performance Summary ---")
+        for res in instance_results:
+            res['instance'] = os.path.basename(instance_path)
+        all_results.extend(instance_results)
 
-            # Filtra e stampa ogni categoria separatamente
-            df_pli = df_results[df_results['algorithm'].isin(['strong', 'weak'])]
-            df_rl = df_results[df_results['algorithm'].isin(['strong_rl', 'weak_rl'])]
-            df_heuristics = df_results[df_results['algorithm'].isin(['greedy', 'erlenkotter'])]
+    if all_results:
+        df_results = pd.DataFrame(all_results)
 
-            print("\n[1] Exact MIP Models (Optimal Solutions)")
-            if not df_pli.empty:
-                print(df_pli.sort_values(by='time_sec').to_string(index=False))
+        # Definiamo l'ordine desiderato per la visualizzazione
+        algo_order = ['strong', 'weak', 'strong_rl', 'weak_rl', 'erlenkotter', 'greedy']
 
-            print("\n[2] Linear Relaxations (Lower Bounds)")
-            if not df_rl.empty:
-                # Ordina per valore dell'obiettivo per vedere la gerarchia
-                print(df_rl.sort_values(by='objective').to_string(index=False))
+        # Convertiamo la colonna 'algorithm' in un tipo categorico con il nostro ordine
+        # Questo ci permette di ordinare il DataFrame secondo la nostra logica
+        df_results['algorithm'] = pd.Categorical(df_results['algorithm'], categories=algo_order, ordered=True)
 
-            print("\n[3] Heuristics (Approximate Solutions)")
-            if not df_heuristics.empty:
-                print(df_heuristics.sort_values(by='objective').to_string(index=False))
+        for instance_name, group in df_results.groupby('instance'):
+            n_fac = group['num_facilities'].iloc[0]
+            n_cust = group['num_customers'].iloc[0]
 
-            # Salva i risultati completi nel CSV
-            output_filename = 'ufl_results.csv'
-            # Ordiniamo il DataFrame prima di salvarlo per coerenza
-            df_results = df_results.sort_values(by=['instance', 'algorithm'])
-            df_results.to_csv(output_filename, index=False)
-            print(f"\nResults saved to {output_filename}")
+            # Ordiniamo il gruppo secondo l'ordine personalizzato
+            sorted_group = group.sort_values('algorithm')
+
+            print(f"\n\n--- Analysis for Instance: {instance_name} (Facilities: {n_fac}, Customers: {n_cust}) ---")
+
+            # 1. Tabella di Qualità
+            print("\n[1] Solution Quality (Cost, Gap, and Facilities Opened)")
+            quality_cols = ['algorithm', 'objective', 'optimality_gap_%', 'opened_facilities_count']
+            print(sorted_group[quality_cols].to_string(index=False))
+
+            # 2. Tabella del Tempo
+            print("\n[2] Computational Time")
+            time_cols = ['algorithm', 'time_sec']
+            print(sorted_group[time_cols].to_string(index=False))
+
+        # Salva il CSV completo, anch'esso ordinato
+        output_filename = 'ufl_results_detailed.csv'
+        final_cols = ['instance', 'algorithm', 'objective', 'time_sec', 'optimality_gap_%',
+                      'opened_facilities_count', 'num_facilities', 'num_customers']
+        # Ordiniamo il DataFrame completo prima di salvarlo
+        df_results = df_results.sort_values(['instance', 'algorithm'])
+        df_results = df_results.reindex(columns=final_cols)
+        df_results.to_csv(output_filename, index=False)
+        print(f"\n\nDetailed results saved to {output_filename}")
 
 
 if __name__ == '__main__':
