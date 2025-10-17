@@ -1,0 +1,43 @@
+============================================================
+ANALYSIS REPORT FOR INSTANCE: gen_f10_c30_s123.txt
+Generated on: 2025-10-17 15:57:11
+============================================================
+
+Instance Details:
+  - Facilities: 10
+  - Customers:  30
+
+--- Algorithm: strong ---
+  - Objective Cost:          178152.85
+  - Computational Time (s):  0.0574
+  - Opened Facilities Count: 2
+  - Opened Facilities (IDs): [0, 5]
+
+--- Algorithm: weak ---
+  - Objective Cost:          178152.85
+  - Computational Time (s):  0.0707
+  - Opened Facilities Count: 2
+  - Opened Facilities (IDs): [0, 5]
+
+--- Algorithm: strong_rl ---
+  - Objective Cost:          178152.85
+  - Computational Time (s):  0.0539
+
+--- Algorithm: weak_rl ---
+  - Objective Cost:          134227.673
+  - Computational Time (s):  0.0533
+
+--- Algorithm: erlenkotter ---
+  - Objective Cost:          178152.85
+  - Computational Time (s):  0.0022
+  - Optimality Gap:          0.0%
+  - Opened Facilities Count: 2
+  - Opened Facilities (IDs): [0, 5]
+
+--- Algorithm: greedy ---
+  - Objective Cost:          178152.85
+  - Computational Time (s):  0.0001
+  - Optimality Gap:          0.0%
+  - Opened Facilities Count: 2
+  - Opened Facilities (IDs): [0, 5]
+

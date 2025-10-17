@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from scipy import stats
+from datetime import datetime
 from src.data_parser import parse_or_library_instance
 from src.models.pli_strong import solve_strong_formulation, solve_strong_relaxation
 from src.models.pli_weak import solve_weak_formulation, solve_weak_relaxation
@@ -19,6 +20,53 @@ ALGORITHMS = {
     'greedy': solve_greedy_heuristic,
     'erlenkotter': solve_erlenkotter,
 }
+
+
+def write_instance_report(instance_name, results_df, output_dir='reports'):
+    """
+    Scrive un report testuale dettagliato per una singola istanza.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Rimuovi l'estensione .txt e aggiungi .log
+    base_name = os.path.splitext(instance_name)[0]
+    report_path = os.path.join(output_dir, f"{base_name}_report.txt")
+
+    n_fac = results_df['num_facilities'].iloc[0]
+    n_cust = results_df['num_customers'].iloc[0]
+
+    with open(report_path, 'w') as f:
+        f.write("=" * 60 + "\n")
+        f.write(f"ANALYSIS REPORT FOR INSTANCE: {instance_name}\n")
+        f.write(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write("=" * 60 + "\n\n")
+        f.write(f"Instance Details:\n")
+        f.write(f"  - Facilities: {n_fac}\n")
+        f.write(f"  - Customers:  {n_cust}\n\n")
+
+        # Ordina i risultati per la scrittura nel report
+        algo_order = ['strong', 'weak', 'strong_rl', 'weak_rl', 'erlenkotter', 'greedy']
+        results_df['algorithm'] = pd.Categorical(results_df['algorithm'], categories=algo_order, ordered=True)
+        sorted_results = results_df.sort_values('algorithm')
+
+        for _, row in sorted_results.iterrows():
+            f.write(f"--- Algorithm: {row['algorithm']} ---\n")
+            f.write(f"  - Objective Cost:          {row['objective']}\n")
+            f.write(f"  - Computational Time (s):  {row['time_sec']:.4f}\n")
+
+            if row['optimality_gap_%'] != '-':
+                f.write(f"  - Optimality Gap:          {row['optimality_gap_%']}%\n")
+
+            if row['opened_facilities_count'] != -1:
+                f.write(f"  - Opened Facilities Count: {row['opened_facilities_count']}\n")
+                # Assumiamo che la lista delle facility sia salvata
+                opened_list_str = ', '.join(map(str, row['opened_facilities']))
+                f.write(f"  - Opened Facilities (IDs): [{opened_list_str}]\n")
+
+            f.write("\n")
+
+    print(f"--> Detailed report saved to {report_path}")
+
 
 
 def main():
@@ -107,13 +155,16 @@ def main():
                 if algo_name in ['strong', 'weak'] and optimal_value is None:
                     optimal_value = objective
 
+                opened_facilities_list = result_obj.get('opened_facilities', [])
+
                 instance_results.append({
                     'algorithm': algo_name,
                     'objective': objective,
                     'time_sec': elapsed_time,
                     'num_facilities': num_fac,
                     'num_customers': num_cust,
-                    'opened_facilities_count': opened_count  # Salviamo subito il conteggio
+                    'opened_facilities_count': opened_count,  # Salviamo subito il conteggio
+                    'opened_facilities': opened_facilities_list
                 })
 
             except Exception as e:
@@ -124,7 +175,8 @@ def main():
                     'time_sec': -1,
                     'num_facilities': num_fac,
                     'num_customers': num_cust,
-                    'opened_facilities_count': -1
+                    'opened_facilities_count': -1,
+                    'opened_facilities': []  # Lista vuota in caso di errore
                 })
 
         if optimal_value is not None:
@@ -138,7 +190,13 @@ def main():
 
         for res in instance_results:
             res['instance'] = os.path.basename(instance_path)
+        # all_results.extend(instance_results)
+
+        df_instance_results = pd.DataFrame(instance_results)
+        write_instance_report(os.path.basename(instance_path), df_instance_results)
+
         all_results.extend(instance_results)
+
 
     if all_results:
         df_results = pd.DataFrame(all_results)
