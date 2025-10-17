@@ -97,25 +97,35 @@ def main():
 
     args = parser.parse_args()
 
-    if os.path.isdir(args.instance):
-        instance_files = [os.path.join(args.instance, f) for f in os.listdir(args.instance) if f.endswith('.txt')]
-    else:
-        instance_files = [args.instance]
+    # --- LOGICA DI RICERCA FILE E PERCORSI ROBUSTA ---
+    instance_files = []
+    root_path_str = args.instance
 
-    if args.algorithm == 'all':
-        algos_to_run = list(ALGORITHMS.keys())
+    if os.path.isdir(root_path_str):
+        for dirpath, _, filenames in os.walk(root_path_str):
+            for filename in filenames:
+                if filename.endswith('.txt'):
+                    instance_files.append(os.path.join(dirpath, filename))
+    elif os.path.isfile(root_path_str):
+        instance_files = [root_path_str]
     else:
-        algos_to_run = [args.algorithm]
+        print(f"Error: Path '{root_path_str}' does not exist or is not a file/directory.")
+        return
+
+    if not instance_files:
+        print(f"No instance files (.txt) found in '{root_path_str}'.")
+        return
+
 
     ordered_algos = [
         'weak', 'strong', 'weak_rl', 'strong_rl', 'erlenkotter', 'greedy'
     ]
-    algos_to_run = [algo for algo in ordered_algos if algo in algos_to_run]
+    algos_to_run = [algo for algo in ordered_algos if
+                    algo in ALGORITHMS and (args.algorithm == 'all' or algo == args.algorithm)]
 
     all_results = []
-
     for instance_path in sorted(instance_files):
-        print(f"\n--- Processing Instance: {os.path.basename(instance_path)} ---")
+        print(f"\n--- Processing Instance: {os.path.relpath(instance_path)} ---")
 
         try:
             num_fac, num_cust, fixed_costs, transport_costs = parse_or_library_instance(instance_path)
@@ -129,54 +139,36 @@ def main():
 
         for algo_name in algos_to_run:
             print(f"  -> Running algorithm: {algo_name}...")
-
+            # ... (Tutto il blocco try/except per eseguire gli algoritmi rimane identico)
             solver_func = ALGORITHMS[algo_name]
             result_obj = None
-
             try:
                 start_time = time.perf_counter()
-
-                # Le funzioni per PLI e RL devono essere modificate per accettare `deterministic`
                 if algo_name in ['strong', 'weak', 'strong_rl', 'weak_rl']:
                     result_obj = solver_func(fixed_costs, transport_costs, solver=args.solver,
                                              deterministic=args.deterministic)
                 else:
                     result_obj = solver_func(fixed_costs, transport_costs)
-
                 end_time = time.perf_counter()
                 elapsed_time = end_time - start_time
-
                 print(f"     Objective: {result_obj['objective']:.2f}")
                 print(f"     Time: {elapsed_time:.4f} seconds")
-
                 objective = result_obj['objective']
-                opened_count = len(result_obj['opened_facilities']) if 'opened_facilities' in result_obj else -1
-
+                opened_facilities_list = result_obj.get('opened_facilities', [])
+                opened_count = len(opened_facilities_list) if opened_facilities_list else -1
                 if algo_name in ['strong', 'weak'] and optimal_value is None:
                     optimal_value = objective
-
-                opened_facilities_list = result_obj.get('opened_facilities', [])
-
                 instance_results.append({
-                    'algorithm': algo_name,
-                    'objective': objective,
-                    'time_sec': elapsed_time,
-                    'num_facilities': num_fac,
-                    'num_customers': num_cust,
-                    'opened_facilities_count': opened_count,  # Salviamo subito il conteggio
-                    'opened_facilities': opened_facilities_list
+                    'algorithm': algo_name, 'objective': objective, 'time_sec': elapsed_time,
+                    'num_facilities': num_fac, 'num_customers': num_cust,
+                    'opened_facilities_count': opened_count, 'opened_facilities': opened_facilities_list
                 })
-
             except Exception as e:
                 print(f"     ERROR running {algo_name}: {e}")
                 instance_results.append({
-                    'algorithm': algo_name,
-                    'objective': 'Error',
-                    'time_sec': -1,
-                    'num_facilities': num_fac,
-                    'num_customers': num_cust,
-                    'opened_facilities_count': -1,
-                    'opened_facilities': []  # Lista vuota in caso di errore
+                    'algorithm': algo_name, 'objective': 'Error', 'time_sec': -1,
+                    'num_facilities': num_fac, 'num_customers': num_cust,
+                    'opened_facilities_count': -1, 'opened_facilities': []
                 })
 
         if optimal_value is not None:
@@ -188,12 +180,38 @@ def main():
                 else:
                     res['optimality_gap_%'] = '-'
 
+        instance_basename = os.path.basename(instance_path)
         for res in instance_results:
-            res['instance'] = os.path.basename(instance_path)
-        # all_results.extend(instance_results)
+            res['instance'] = instance_basename
+
+        # --- LOGICA DI CREAZIONE SOTTOCARTELLE CORRETTA ---
+        report_output_dir = 'reports'  # Default
+        try:
+            # Normalizza i percorsi per coerenza
+            full_instance_path = os.path.abspath(instance_path)
+            # Trova il percorso della cartella 'data'
+            data_folder_path = None
+            path_parts = full_instance_path.split(os.sep)
+            for i, part in enumerate(path_parts):
+                if part == 'data':
+                    # Ricostruisce il percorso fino a 'data' incluso
+                    data_folder_path = os.path.join(*path_parts[:i + 1])
+                    break
+
+            if data_folder_path:
+                # Calcola il percorso relativo della cartella del file rispetto a 'data'
+                instance_dir = os.path.dirname(full_instance_path)
+                relative_subdir = os.path.relpath(instance_dir, data_folder_path)
+                if relative_subdir != '.':
+                    report_output_dir = os.path.join('reports', relative_subdir)
+
+        except (ValueError, IndexError):
+            # Se 'data' non è nel percorso, salva nella cartella reports di base
+            print(f"Warning: 'data' directory not in path for {instance_path}. Saving report to root 'reports/' dir.")
+            report_output_dir = 'reports'
 
         df_instance_results = pd.DataFrame(instance_results)
-        write_instance_report(os.path.basename(instance_path), df_instance_results)
+        write_instance_report(instance_basename, df_instance_results, output_dir=report_output_dir)
 
         all_results.extend(instance_results)
 
