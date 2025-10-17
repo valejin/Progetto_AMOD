@@ -46,9 +46,9 @@ def write_instance_to_file(filepath, num_facilities, num_customers, fixed_costs,
         f.write(f"{num_facilities} {num_customers}\n")
 
         # Sezione Dati delle Facility
-        # Scriviamo il costo fisso (15000) e una capacità fittizia (1.0).
+        # Scriviamo una capacità fittizia (1.0) e il costo fisso (15000).
         for cost in fixed_costs:
-            f.write(f"{cost} 1.0\n")
+            f.write(f"1.0 {cost}\n")
 
         # Sezione Dati dei Clienti
         all_customer_data = []

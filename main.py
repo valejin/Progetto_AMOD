@@ -1,7 +1,10 @@
 import os
 import time
 import argparse
+
+import numpy as np
 import pandas as pd
+from scipy import stats
 from src.data_parser import parse_or_library_instance
 from src.models.pli_strong import solve_strong_formulation, solve_strong_relaxation
 from src.models.pli_weak import solve_weak_formulation, solve_weak_relaxation
@@ -175,6 +178,50 @@ def main():
         df_results = df_results.reindex(columns=final_cols)
         df_results.to_csv(output_filename, index=False)
         print(f"\n\nDetailed results saved to {output_filename}")
+
+
+        # --- NUOVA SEZIONE: ANALISI STATISTICA AGGREGATA ---
+        print("\n\n" + "=" * 80)
+        print("--- AGGREGATE PERFORMANCE ANALYSIS (COMPUTATIONAL TIME) ---".center(80))
+        print("=" * 80)
+
+        summary_data = []
+        # Filtra solo le esecuzioni andate a buon fine
+        df_successful = df_results[df_results['time_sec'] >= 0].copy()
+
+        for algo_name, group in df_successful.groupby('algorithm'):
+            times = group['time_sec']
+            n = len(times)
+            mean_time = times.mean()
+            min_time = times.min()
+            max_time = times.max()
+
+            # Calcola l'intervallo di confidenza solo se ci sono abbastanza dati
+            if n > 1:
+                std_dev = times.std()
+                # Standard error of the mean
+                sem = std_dev / np.sqrt(n)
+                # t-value per 95% di confidenza con n-1 gradi di libertà
+                t_crit = stats.t.ppf(0.975, df=n - 1)
+                ci_lower = mean_time - t_crit * sem
+                ci_upper = mean_time + t_crit * sem
+                ci_str = f"[{ci_lower:.4f}, {ci_upper:.4f}]"
+            else:
+                ci_str = "N/A"
+
+            summary_data.append({
+                "Algorithm": algo_name,
+                "Instances": n,
+                "Mean Time (s)": mean_time,
+                "95% CI": ci_str,
+                "Time Range (s)": f"[{min_time:.4f}, {max_time:.4f}]"
+            })
+
+        if summary_data:
+            df_summary = pd.DataFrame(summary_data)
+            df_summary = df_summary.set_index('Algorithm').reindex(algo_order).dropna().reset_index()
+            print(df_summary.to_string(index=False))
+        print("=" * 80)
 
 
 if __name__ == '__main__':
