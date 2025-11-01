@@ -3,8 +3,8 @@ import numpy as np
 
 def solve_erlenkotter(fixed_costs, transport_costs):
     """
-    Implements Erlenkotter's DUALOC algorithm, featuring the formal
-    Dual Ascent procedure followed by primal construction and local search.
+    Implements Erlenkotter's Dual Ascent procedure to compute a dual
+    lower bound for the UFL problem.
     """
     num_facilities, num_customers = transport_costs.shape
 
@@ -36,7 +36,7 @@ def solve_erlenkotter(fixed_costs, transport_costs):
 
     # Step 2: Loop principale
     while True:
-        delta_flag = False # Corrisponde a delta=0 nello pseudocodice
+        delta_flag = False
 
         # Loop sui clienti j = 0 a n-1
         for j in range(num_customers):
@@ -83,62 +83,14 @@ def solve_erlenkotter(fixed_costs, transport_costs):
 
     # --- FINE DUAL ASCENT ---
 
-    # --- Primal Construction & Local Search Improvement ---
-    # Apriamo le facility che sono "profittevoli" (surplus <= 0)
-    opened_facilities = set(np.where(surplus <= 1e-9)[0])
+    # --- CALCOLO DEL LOWER BOUND DUALE ---
+    # Il valore dell'obiettivo duale è la somma dei v_j
+    dual_lower_bound = np.sum(v)
 
-    if not opened_facilities:
-        total_costs_if_single = fixed_costs + np.sum(transport_costs, axis=1)
-        best_initial_facility = np.argmin(total_costs_if_single)
-        opened_facilities.add(best_initial_facility)
 
-    # Miglioramento Locale (ADD/DROP), identico a prima
-    while True:
-        current_obj = calculate_objective(opened_facilities, fixed_costs, transport_costs)
-        improved = False
-
-        # Try to ADD a facility
-        best_add_candidate = -1
-        best_add_saving = 0
-        for i in range(num_facilities):
-            if i not in opened_facilities:
-                new_set = opened_facilities.union({i})
-                new_obj = calculate_objective(new_set, fixed_costs, transport_costs)
-                saving = current_obj - new_obj
-                if saving > best_add_saving:
-                    best_add_saving = saving
-                    best_add_candidate = i
-
-        if best_add_candidate != -1 and best_add_saving > 1e-6:
-            opened_facilities.add(best_add_candidate)
-            improved = True
-            continue
-
-        # Try to DROP a facility
-        best_drop_candidate = -1
-        best_drop_saving = 0
-        for i in list(opened_facilities):
-            if len(opened_facilities) > 1:
-                new_set = opened_facilities.difference({i})
-                new_obj = calculate_objective(new_set, fixed_costs, transport_costs)
-                saving = current_obj - new_obj
-                if saving > best_drop_saving:
-                    best_drop_saving = saving
-                    best_drop_candidate = i
-
-        if best_drop_candidate != -1 and best_drop_saving > 1e-6:
-            opened_facilities.remove(best_drop_candidate)
-            improved = True
-            continue
-
-        if not improved:
-            break
-
-    final_objective = calculate_objective(opened_facilities, fixed_costs, transport_costs)
-
+    # Restituisce SOLO il lower bound come 'objective'
     return {
-        'objective': final_objective,
-        'opened_facilities': sorted(list(opened_facilities))
+        'objective': dual_lower_bound
     }
 
 

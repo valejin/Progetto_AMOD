@@ -139,7 +139,6 @@ def main():
 
         for algo_name in algos_to_run:
             print(f"  -> Running algorithm: {algo_name}...")
-            # ... (Tutto il blocco try/except per eseguire gli algoritmi rimane identico)
             solver_func = ALGORITHMS[algo_name]
             result_obj = None
             try:
@@ -156,6 +155,7 @@ def main():
                 objective = result_obj['objective']
                 opened_facilities_list = result_obj.get('opened_facilities', [])
                 opened_count = len(opened_facilities_list) if opened_facilities_list else -1
+
                 if algo_name in ['strong', 'weak'] and optimal_value is None:
                     optimal_value = objective
                 instance_results.append({
@@ -163,6 +163,8 @@ def main():
                     'num_facilities': num_fac, 'num_customers': num_cust,
                     'opened_facilities_count': opened_count, 'opened_facilities': opened_facilities_list
                 })
+
+
             except Exception as e:
                 print(f"     ERROR running {algo_name}: {e}")
                 instance_results.append({
@@ -171,9 +173,10 @@ def main():
                     'opened_facilities_count': -1, 'opened_facilities': []
                 })
 
+        # Calcolo del Gap: ora solo per 'greedy'
         if optimal_value is not None:
             for res in instance_results:
-                if res['algorithm'] in ['greedy', 'erlenkotter'] and isinstance(res['objective'], (int, float)):
+                if res['algorithm'] == 'greedy' and isinstance(res['objective'], (int, float)):
                     z_heur = res['objective']
                     gap = ((z_heur - optimal_value) / optimal_value) * 100 if optimal_value > 0 else 0
                     res['optimality_gap_%'] = round(gap, 2)
