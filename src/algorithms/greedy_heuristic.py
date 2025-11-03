@@ -18,19 +18,19 @@ def solve_greedy_heuristic(fixed_costs, transport_costs):
     opened_facilities = set()
     closed_facilities = set(range(num_facilities))
 
-    # Initially, assign each customer to a dummy facility with infinite cost
+    # Inizialmente, assegnare a ciascun cliente una struttura fittizia con costi infiniti
     current_assignment_costs = np.full(num_customers, np.inf)
 
     while True:
         best_saving = -np.inf
         best_facility_to_open = -1
 
-        # Evaluate opening each currently closed facility
+        # Valutare l'apertura di ogni struttura attualmente chiusa
         for facility_idx in closed_facilities:
-            # Calculate the potential new assignment costs if we open this facility
+            # Calcola i potenziali nuovi costi di assegnazione se apriamo questa struttura
             potential_new_costs = np.minimum(current_assignment_costs, transport_costs[facility_idx, :])
 
-            # Saving is the reduction in transport costs minus the fixed cost
+            # Il risparmio è la riduzione dei costi di trasporto meno il costo fisso di apertura
             transport_saving = np.sum(current_assignment_costs - potential_new_costs)
             total_saving = transport_saving - fixed_costs[facility_idx]
 
@@ -38,16 +38,16 @@ def solve_greedy_heuristic(fixed_costs, transport_costs):
                 best_saving = total_saving
                 best_facility_to_open = facility_idx
 
-        # If no facility provides a positive saving, stop
+        # Se nessuna facility chiusa può offrire un risparmio positivo, stop
         if best_saving > 0:
             opened_facilities.add(best_facility_to_open)
             closed_facilities.remove(best_facility_to_open)
-            # Update the current assignment costs for the next iteration
+            # Aggiorna i costi di assegnazione correnti per la prossima iterazione
             current_assignment_costs = np.minimum(current_assignment_costs, transport_costs[best_facility_to_open, :])
         else:
             break
 
-    # Calculate final objective value
+    # Calcola il valore obiettivo finale
     final_fixed_cost = np.sum(fixed_costs[list(opened_facilities)])
     final_transport_cost = np.sum(current_assignment_costs)
     objective_value = final_fixed_cost + final_transport_cost
