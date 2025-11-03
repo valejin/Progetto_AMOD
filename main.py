@@ -173,47 +173,84 @@ def main():
                     'opened_facilities_count': -1, 'opened_facilities': []
                 })
 
-        # Calcolo del Gap: ora solo per 'greedy'
-        if optimal_value is not None:
-            for res in instance_results:
-                if res['algorithm'] == 'greedy' and isinstance(res['objective'], (int, float)):
-                    z_heur = res['objective']
-                    gap = ((z_heur - optimal_value) / optimal_value) * 100 if optimal_value > 0 else 0
-                    res['optimality_gap_%'] = round(gap, 2)
-                else:
-                    res['optimality_gap_%'] = '-'
+            # --- CALCOLO DI TUTTI I GAP ---
+            if optimal_value is not None:
+                for res in instance_results:
+                    algo = res['algorithm']
+                    value = res['objective']
+
+                    # Salta se il risultato è un errore
+                    if not isinstance(value, (int, float)):
+                        res['optimality_gap_%'] = '-'
+                        continue
+
+                    gap = 0.0
+                    # Calcola il GAP DI OTTIMALITÀ per l'Upper Bound (greedy)
+                    if algo == 'greedy':
+                        gap = ((value - optimal_value) / optimal_value) * 100 if optimal_value > 0 else 0
+                        res['optimality_gap_%'] = round(gap, 2)
+
+                    # Calcola il GAP DI DUALITÀ per i Lower Bounds
+                    elif algo in ['strong_rl', 'weak_rl', 'erlenkotter']:
+                        gap = ((optimal_value - value) / optimal_value) * 100 if optimal_value > 0 else 0
+                        res['optimality_gap_%'] = round(gap, 2)
+
+                    # Per le soluzioni ottime, il gap è 0 (o non si applica)
+                    else:
+                        res['optimality_gap_%'] = '-'
 
         instance_basename = os.path.basename(instance_path)
+
         for res in instance_results:
             res['instance'] = instance_basename
 
+        # # --- LOGICA DI CREAZIONE SOTTOCARTELLE CORRETTA ---
+        # report_output_dir = 'reports'  # Default
+        # try:
+        #     # Normalizza i percorsi per coerenza
+        #     full_instance_path = os.path.abspath(instance_path)
+        #     # Trova il percorso della cartella 'data'
+        #     data_folder_path = None
+        #     path_parts = full_instance_path.split(os.sep)
+        #     for i, part in enumerate(path_parts):
+        #         if part == 'data':
+        #             # Ricostruisce il percorso fino a 'data' incluso
+        #             data_folder_path = os.path.join(*path_parts[:i + 1])
+        #             break
+        #
+        #     if data_folder_path:
+        #         # Calcola il percorso relativo della cartella del file rispetto a 'data'
+        #         instance_dir = os.path.dirname(full_instance_path)
+        #         relative_subdir = os.path.relpath(instance_dir, data_folder_path)
+        #         if relative_subdir != '.':
+        #             report_output_dir = os.path.join('reports', relative_subdir)
+        #
+        # except (ValueError, IndexError):
+        #     # Se 'data' non è nel percorso, salva nella cartella reports di base
+        #     print(f"Warning: 'data' directory not in path for {instance_path}. Saving report to root 'reports/' dir.")
+        #     report_output_dir = 'reports'
+        #
+        # df_instance_results = pd.DataFrame(instance_results)
+        # write_instance_report(instance_basename, df_instance_results, output_dir=report_output_dir)
+        #
+        # all_results.extend(instance_results)
+
         # --- LOGICA DI CREAZIONE SOTTOCARTELLE CORRETTA ---
-        report_output_dir = 'reports'  # Default
-        try:
-            # Normalizza i percorsi per coerenza
-            full_instance_path = os.path.abspath(instance_path)
-            # Trova il percorso della cartella 'data'
-            data_folder_path = None
-            path_parts = full_instance_path.split(os.sep)
-            for i, part in enumerate(path_parts):
-                if part == 'data':
-                    # Ricostruisce il percorso fino a 'data' incluso
-                    data_folder_path = os.path.join(*path_parts[:i + 1])
-                    break
+        # La directory di base per il calcolo del percorso relativo è quella passata come argomento
+        root_input_dir_for_relpath = args.instance if os.path.isdir(args.instance) else os.path.dirname(
+            args.instance)
 
-            if data_folder_path:
-                # Calcola il percorso relativo della cartella del file rispetto a 'data'
-                instance_dir = os.path.dirname(full_instance_path)
-                relative_subdir = os.path.relpath(instance_dir, data_folder_path)
-                if relative_subdir != '.':
-                    report_output_dir = os.path.join('reports', relative_subdir)
+        instance_dir_abs = os.path.abspath(os.path.dirname(instance_path))
+        root_input_abs = os.path.abspath(root_input_dir_for_relpath)
 
-        except (ValueError, IndexError):
-            # Se 'data' non è nel percorso, salva nella cartella reports di base
-            print(f"Warning: 'data' directory not in path for {instance_path}. Saving report to root 'reports/' dir.")
-            report_output_dir = 'reports'
+        relative_subdir = os.path.relpath(instance_dir_abs, root_input_abs)
+        report_output_dir = os.path.join('reports', relative_subdir) if relative_subdir != '.' else 'reports'
 
         df_instance_results = pd.DataFrame(instance_results)
+        # Passiamo la lista delle facility alla funzione di report
+        for res in instance_results:
+            res['instance'] = instance_basename
+
         write_instance_report(instance_basename, df_instance_results, output_dir=report_output_dir)
 
         all_results.extend(instance_results)
@@ -259,7 +296,7 @@ def main():
         print(f"\n\nDetailed results saved to {output_filename}")
 
 
-        # --- NUOVA SEZIONE: ANALISI STATISTICA AGGREGATA ---
+        # --- ANALISI STATISTICA AGGREGATA ---
         print("\n\n" + "=" * 80)
         print("--- AGGREGATE PERFORMANCE ANALYSIS (COMPUTATIONAL TIME) ---".center(80))
         print("=" * 80)

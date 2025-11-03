@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: cap84.txt
-Generated on: 2025-10-17 15:57:10
+Generated on: 2025-11-03 11:08:14
 ============================================================
 
 Instance Details:
@@ -9,34 +9,34 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.0684
+  - Computational Time (s):  0.0662
   - Opened Facilities Count: 4
   - Opened Facilities (IDs): [10, 12, 17, 23]
 
 --- Algorithm: weak ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.0844
+  - Computational Time (s):  0.0717
   - Opened Facilities Count: 4
   - Opened Facilities (IDs): [10, 12, 17, 23]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.0629
+  - Computational Time (s):  0.0664
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          674734.5874999999
-  - Computational Time (s):  0.0566
+  - Computational Time (s):  0.0455
+  - Optimality Gap:          27.37%
 
 --- Algorithm: erlenkotter ---
   - Objective Cost:          928941.75
-  - Computational Time (s):  0.0069
-  - Optimality Gap:          -0.0%
-  - Opened Facilities Count: 4
-  - Opened Facilities (IDs): [10, 12, 17, 23]
+  - Computational Time (s):  0.0042
+  - Optimality Gap:          0.0%
 
 --- Algorithm: greedy ---
   - Objective Cost:          940141.5375000001
-  - Computational Time (s):  0.0005
+  - Computational Time (s):  0.0006
   - Optimality Gap:          1.21%
   - Opened Facilities Count: 5
   - Opened Facilities (IDs): [0, 10, 12, 17, 23]
