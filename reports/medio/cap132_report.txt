@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: cap132.txt
-Generated on: 2025-10-17 15:32:33
+Generated on: 2025-11-03 13:40:05
 ============================================================
 
 Instance Details:
@@ -9,34 +9,34 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          851495.3250000001
-  - Computational Time (s):  0.2110
+  - Computational Time (s):  0.0731
   - Opened Facilities Count: 11
   - Opened Facilities (IDs): [5, 10, 12, 14, 22, 24, 26, 33, 44, 45, 48]
 
 --- Algorithm: weak ---
   - Objective Cost:          851495.3250000001
-  - Computational Time (s):  0.1179
+  - Computational Time (s):  0.1016
   - Opened Facilities Count: 11
   - Opened Facilities (IDs): [5, 10, 12, 14, 22, 24, 26, 33, 44, 45, 48]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          851495.3250000001
-  - Computational Time (s):  0.0782
+  - Computational Time (s):  0.0660
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          636321.4500000001
-  - Computational Time (s):  0.0782
+  - Computational Time (s):  0.0581
+  - Optimality Gap:          25.27%
 
 --- Algorithm: erlenkotter ---
-  - Objective Cost:          851495.3250000001
-  - Computational Time (s):  0.0080
-  - Optimality Gap:          0.0%
-  - Opened Facilities Count: 11
-  - Opened Facilities (IDs): [5, 10, 12, 14, 22, 24, 26, 33, 44, 45, 48]
+  - Objective Cost:          848934.2000000001
+  - Computational Time (s):  0.0067
+  - Optimality Gap:          0.3%
 
 --- Algorithm: greedy ---
   - Objective Cost:          862753.375
-  - Computational Time (s):  0.0020
+  - Computational Time (s):  0.0023
   - Optimality Gap:          1.32%
   - Opened Facilities Count: 12
   - Opened Facilities (IDs): [0, 5, 10, 12, 14, 22, 24, 26, 33, 36, 44, 45]

@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: gen_f100_c150_s123.txt
-Generated on: 2025-10-17 16:34:51
+Generated on: 2025-11-03 13:43:36
 ============================================================
 
 Instance Details:
@@ -9,34 +9,34 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          330897.0800000001
-  - Computational Time (s):  0.2660
+  - Computational Time (s):  0.2197
   - Opened Facilities Count: 9
   - Opened Facilities (IDs): [22, 28, 41, 49, 51, 78, 86, 90, 91]
 
 --- Algorithm: weak ---
   - Objective Cost:          330897.0800000001
-  - Computational Time (s):  2.0241
+  - Computational Time (s):  1.7860
   - Opened Facilities Count: 9
   - Opened Facilities (IDs): [22, 28, 41, 49, 51, 78, 86, 90, 91]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          330897.0800000001
-  - Computational Time (s):  0.1877
+  - Computational Time (s):  0.2021
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          115691.18619999994
-  - Computational Time (s):  0.1858
+  - Computational Time (s):  0.1480
+  - Optimality Gap:          65.04%
 
 --- Algorithm: erlenkotter ---
-  - Objective Cost:          331457.01
-  - Computational Time (s):  0.0374
-  - Optimality Gap:          0.17%
-  - Opened Facilities Count: 9
-  - Opened Facilities (IDs): [28, 49, 51, 54, 67, 78, 86, 90, 91]
+  - Objective Cost:          326224.63
+  - Computational Time (s):  0.0391
+  - Optimality Gap:          1.41%
 
 --- Algorithm: greedy ---
   - Objective Cost:          400147.86000000004
-  - Computational Time (s):  0.0046
+  - Computational Time (s):  0.0044
   - Optimality Gap:          20.93%
   - Opened Facilities Count: 9
   - Opened Facilities (IDs): [0, 22, 49, 51, 52, 78, 86, 90, 91]

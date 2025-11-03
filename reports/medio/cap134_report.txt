@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: cap134.txt
-Generated on: 2025-10-17 15:32:34
+Generated on: 2025-11-03 13:40:06
 ============================================================
 
 Instance Details:
@@ -9,30 +9,30 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.0890
+  - Computational Time (s):  0.0751
   - Opened Facilities Count: 4
   - Opened Facilities (IDs): [22, 26, 36, 45]
 
 --- Algorithm: weak ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.1149
+  - Computational Time (s):  0.1080
   - Opened Facilities Count: 4
   - Opened Facilities (IDs): [22, 26, 36, 45]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          928941.7500000001
-  - Computational Time (s):  0.0814
+  - Computational Time (s):  0.0685
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          648426.3
-  - Computational Time (s):  0.0756
+  - Computational Time (s):  0.0709
+  - Optimality Gap:          30.2%
 
 --- Algorithm: erlenkotter ---
-  - Objective Cost:          928941.75
-  - Computational Time (s):  0.0167
-  - Optimality Gap:          -0.0%
-  - Opened Facilities Count: 4
-  - Opened Facilities (IDs): [22, 26, 36, 45]
+  - Objective Cost:          922586.625
+  - Computational Time (s):  0.0083
+  - Optimality Gap:          0.68%
 
 --- Algorithm: greedy ---
   - Objective Cost:          948299.9500000001

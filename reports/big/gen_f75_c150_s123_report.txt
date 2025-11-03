@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: gen_f75_c150_s123.txt
-Generated on: 2025-10-17 16:35:09
+Generated on: 2025-11-03 13:43:51
 ============================================================
 
 Instance Details:
@@ -9,34 +9,34 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          2681271.45
-  - Computational Time (s):  0.1911
+  - Computational Time (s):  0.1803
   - Opened Facilities Count: 3
   - Opened Facilities (IDs): [24, 34, 65]
 
 --- Algorithm: weak ---
   - Objective Cost:          2681271.45
-  - Computational Time (s):  2.8799
+  - Computational Time (s):  3.0601
   - Opened Facilities Count: 3
   - Opened Facilities (IDs): [24, 34, 65]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          2681271.45
-  - Computational Time (s):  0.1622
+  - Computational Time (s):  0.1450
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          1059480.802733333
-  - Computational Time (s):  0.1291
+  - Computational Time (s):  0.1285
+  - Optimality Gap:          60.49%
 
 --- Algorithm: erlenkotter ---
-  - Objective Cost:          2681271.45
-  - Computational Time (s):  0.0442
-  - Optimality Gap:          0.0%
-  - Opened Facilities Count: 3
-  - Opened Facilities (IDs): [24, 34, 65]
+  - Objective Cost:          2678012.9300000006
+  - Computational Time (s):  0.0399
+  - Optimality Gap:          0.12%
 
 --- Algorithm: greedy ---
   - Objective Cost:          3091237.04
-  - Computational Time (s):  0.0013
+  - Computational Time (s):  0.0012
   - Optimality Gap:          15.29%
   - Opened Facilities Count: 3
   - Opened Facilities (IDs): [0, 24, 34]

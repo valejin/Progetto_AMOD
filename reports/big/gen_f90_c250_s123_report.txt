@@ -1,0 +1,43 @@
+============================================================
+ANALYSIS REPORT FOR INSTANCE: gen_f90_c250_s123.txt
+Generated on: 2025-11-03 13:44:15
+============================================================
+
+Instance Details:
+  - Facilities: 90
+  - Customers:  250
+
+--- Algorithm: strong ---
+  - Objective Cost:          656272.6999999996
+  - Computational Time (s):  0.3541
+  - Opened Facilities Count: 3
+  - Opened Facilities (IDs): [5, 12, 88]
+
+--- Algorithm: weak ---
+  - Objective Cost:          656272.6999999996
+  - Computational Time (s):  2.7990
+  - Opened Facilities Count: 3
+  - Opened Facilities (IDs): [5, 12, 88]
+
+--- Algorithm: strong_rl ---
+  - Objective Cost:          656272.6999999996
+  - Computational Time (s):  0.2634
+  - Optimality Gap:          0.0%
+
+--- Algorithm: weak_rl ---
+  - Objective Cost:          234167.2867999999
+  - Computational Time (s):  0.1753
+  - Optimality Gap:          64.32%
+
+--- Algorithm: erlenkotter ---
+  - Objective Cost:          652578.56
+  - Computational Time (s):  0.0851
+  - Optimality Gap:          0.56%
+
+--- Algorithm: greedy ---
+  - Objective Cost:          705968.09
+  - Computational Time (s):  0.0016
+  - Optimality Gap:          7.57%
+  - Opened Facilities Count: 3
+  - Opened Facilities (IDs): [0, 5, 88]
+

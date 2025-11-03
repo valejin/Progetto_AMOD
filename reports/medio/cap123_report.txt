@@ -1,0 +1,43 @@
+============================================================
+ANALYSIS REPORT FOR INSTANCE: cap123.txt
+Generated on: 2025-11-03 13:40:04
+============================================================
+
+Instance Details:
+  - Facilities: 50
+  - Customers:  50
+
+--- Algorithm: strong ---
+  - Objective Cost:          893076.7125000001
+  - Computational Time (s):  0.0714
+  - Opened Facilities Count: 8
+  - Opened Facilities (IDs): [5, 22, 24, 26, 33, 44, 45, 48]
+
+--- Algorithm: weak ---
+  - Objective Cost:          893076.7125000001
+  - Computational Time (s):  0.1149
+  - Opened Facilities Count: 8
+  - Opened Facilities (IDs): [5, 22, 24, 26, 33, 44, 45, 48]
+
+--- Algorithm: strong_rl ---
+  - Objective Cost:          893076.7125000001
+  - Computational Time (s):  0.0652
+  - Optimality Gap:          0.0%
+
+--- Algorithm: weak_rl ---
+  - Objective Cost:          641221.4500000001
+  - Computational Time (s):  0.0599
+  - Optimality Gap:          28.2%
+
+--- Algorithm: erlenkotter ---
+  - Objective Cost:          889004.7375
+  - Computational Time (s):  0.0077
+  - Optimality Gap:          0.46%
+
+--- Algorithm: greedy ---
+  - Objective Cost:          908583.0125
+  - Computational Time (s):  0.0024
+  - Optimality Gap:          1.74%
+  - Opened Facilities Count: 8
+  - Opened Facilities (IDs): [0, 5, 22, 24, 26, 36, 44, 45]
+

@@ -1,6 +1,6 @@
 ============================================================
 ANALYSIS REPORT FOR INSTANCE: gen_f75_c200_s123.txt
-Generated on: 2025-10-17 16:35:11
+Generated on: 2025-11-03 13:43:53
 ============================================================
 
 Instance Details:
@@ -9,34 +9,34 @@ Instance Details:
 
 --- Algorithm: strong ---
   - Objective Cost:          968075.3999999998
-  - Computational Time (s):  0.2043
+  - Computational Time (s):  0.2179
   - Opened Facilities Count: 14
   - Opened Facilities (IDs): [19, 33, 39, 41, 48, 50, 51, 55, 56, 64, 68, 72, 73, 74]
 
 --- Algorithm: weak ---
   - Objective Cost:          968075.3999999998
-  - Computational Time (s):  0.7186
+  - Computational Time (s):  0.6931
   - Opened Facilities Count: 14
   - Opened Facilities (IDs): [19, 33, 39, 41, 48, 50, 51, 55, 56, 64, 68, 72, 73, 74]
 
 --- Algorithm: strong_rl ---
   - Objective Cost:          968075.3999999998
-  - Computational Time (s):  0.1704
+  - Computational Time (s):  0.1671
+  - Optimality Gap:          0.0%
 
 --- Algorithm: weak_rl ---
   - Objective Cost:          417045.27154999983
-  - Computational Time (s):  0.1554
+  - Computational Time (s):  0.1447
+  - Optimality Gap:          56.92%
 
 --- Algorithm: erlenkotter ---
-  - Objective Cost:          968075.4
-  - Computational Time (s):  0.0338
-  - Optimality Gap:          0.0%
-  - Opened Facilities Count: 14
-  - Opened Facilities (IDs): [19, 33, 39, 41, 48, 50, 51, 55, 56, 64, 68, 72, 73, 74]
+  - Objective Cost:          965320.21
+  - Computational Time (s):  0.0471
+  - Optimality Gap:          0.28%
 
 --- Algorithm: greedy ---
   - Objective Cost:          992860.64
-  - Computational Time (s):  0.0045
+  - Computational Time (s):  0.0048
   - Optimality Gap:          2.56%
   - Opened Facilities Count: 15
   - Opened Facilities (IDs): [0, 19, 39, 40, 41, 48, 50, 51, 55, 56, 60, 68, 72, 73, 74]
