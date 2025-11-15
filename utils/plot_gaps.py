@@ -29,7 +29,7 @@ def plot_gap_analysis_boxplot(df, category_name, output_dir='reports'):
         palette='viridis',
         ax=ax
     )
-    # Per un'alternativa visiva, puoi usare: sns.violinplot(...)
+
 
     ax.set_title(f'Gap Distribution for "{category_name}" Instances', fontsize=16, weight='bold')
     ax.set_xlabel('Algorithm / Bound', fontsize=12)

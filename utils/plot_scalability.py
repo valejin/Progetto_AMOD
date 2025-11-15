@@ -25,7 +25,7 @@ def plot_performance_comparison(df, category_name, output_dir='reports_scalabili
         ax=ax
     )
 
-    ax.set_yscale('log')  # La scala logaritmica è ancora essenziale
+    ax.set_yscale('log')  # La scala logaritmica
 
     ax.set_title(f'Performance Comparison for "{category_name}" Instances', fontsize=16, weight='bold')
     ax.set_xlabel('Instance Name', fontsize=12)
@@ -67,9 +67,9 @@ if __name__ == '__main__':
 
 
     def assign_category(size):
-        if size <= 1500:  # Esempio: fino a 30x50
+        if size <= 1500:
             return 'small'
-        elif size <= 10000:  # Esempio: fino a 100x100
+        elif size <= 10000:
             return 'medio'
         else:
             return 'big'

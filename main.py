@@ -28,7 +28,7 @@ def write_instance_report(instance_name, results_df, output_dir='reports'):
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    # Rimuovi l'estensione .txt e aggiungi .log
+    # Rimuove l'estensione .txt e aggiungi .log
     base_name = os.path.splitext(instance_name)[0]
     report_path = os.path.join(output_dir, f"{base_name}_report.txt")
 
@@ -204,36 +204,6 @@ def main():
         for res in instance_results:
             res['instance'] = instance_basename
 
-        # # --- LOGICA DI CREAZIONE SOTTOCARTELLE CORRETTA ---
-        # report_output_dir = 'reports'  # Default
-        # try:
-        #     # Normalizza i percorsi per coerenza
-        #     full_instance_path = os.path.abspath(instance_path)
-        #     # Trova il percorso della cartella 'data'
-        #     data_folder_path = None
-        #     path_parts = full_instance_path.split(os.sep)
-        #     for i, part in enumerate(path_parts):
-        #         if part == 'data':
-        #             # Ricostruisce il percorso fino a 'data' incluso
-        #             data_folder_path = os.path.join(*path_parts[:i + 1])
-        #             break
-        #
-        #     if data_folder_path:
-        #         # Calcola il percorso relativo della cartella del file rispetto a 'data'
-        #         instance_dir = os.path.dirname(full_instance_path)
-        #         relative_subdir = os.path.relpath(instance_dir, data_folder_path)
-        #         if relative_subdir != '.':
-        #             report_output_dir = os.path.join('reports', relative_subdir)
-        #
-        # except (ValueError, IndexError):
-        #     # Se 'data' non è nel percorso, salva nella cartella reports di base
-        #     print(f"Warning: 'data' directory not in path for {instance_path}. Saving report to root 'reports/' dir.")
-        #     report_output_dir = 'reports'
-        #
-        # df_instance_results = pd.DataFrame(instance_results)
-        # write_instance_report(instance_basename, df_instance_results, output_dir=report_output_dir)
-        #
-        # all_results.extend(instance_results)
 
         # --- LOGICA DI CREAZIONE SOTTOCARTELLE CORRETTA ---
         # La directory di base per il calcolo del percorso relativo è quella passata come argomento

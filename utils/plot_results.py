@@ -16,7 +16,7 @@ def plot_instance_summary(df, instance_name, num_facilities, num_customers, outp
         print(f"No data found for instance {instance_name}. Skipping plot.")
         return
 
-    # Separiamo i valori per chiarezza. Gestiamo il caso in cui l'ottimo non sia stato trovato.
+    # Gestiamo il caso in cui l'ottimo non sia stato trovato.
     try:
         optimal_value = instance_df[instance_df['algorithm'].isin(['strong', 'weak'])]['objective'].iloc[0]
     except IndexError:
@@ -30,14 +30,14 @@ def plot_instance_summary(df, instance_name, num_facilities, num_customers, outp
             return 'Optimal'
         if algo == 'greedy':  # Solo greedy è il upper bound euristico
             return 'Upper Bound (Heuristic)'
-        # erlenkotter ora è un lower bound
+        # erlenkotter è un lower bound
         if 'rl' in algo or algo == 'erlenkotter':
             return 'Lower Bound'
         return 'Other'
 
     instance_df['type'] = instance_df['algorithm'].apply(get_type)
 
-    # Ordiniamo per una visualizzazione più pulita
+    # Ordiniamo per visualizzazione
     algo_order = ['strong', 'weak', 'greedy', 'strong_rl', 'weak_rl', 'erlenkotter']
     instance_df['algorithm'] = pd.Categorical(instance_df['algorithm'], categories=algo_order, ordered=True)
     instance_df = instance_df.sort_values('algorithm')
@@ -56,7 +56,7 @@ def plot_instance_summary(df, instance_name, num_facilities, num_customers, outp
         ax=ax
     )
 
-    # Aggiungi una linea verticale per l'ottimo, se esiste
+    # Aggiunge una linea verticale per l'ottimo
     if optimal_value is not None:
         ax.axvline(x=optimal_value, color='red', linestyle='--', linewidth=2,
                    label=f'Optimal Value ({optimal_value:,.2f})')
@@ -72,7 +72,7 @@ def plot_instance_summary(df, instance_name, num_facilities, num_customers, outp
     ax.set_ylabel('Algorithm / Bound', fontsize=12)
     ax.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,.0f}".format(x)))
 
-    # Aggiungi le etichette con i valori sulle barre
+    # Aggiunge le etichette con i valori sulle barre
     for container in ax.containers:
         ax.bar_label(container, fmt='{:,.2f}', padding=5, fontsize=10, rotation=0)
 
